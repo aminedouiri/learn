@@ -1,0 +1,44 @@
+filter structure and direction
+
+    if (Session::has('dr_id')) {
+        $affairesWithSite = $affairesWithSite->where("Taffaire.Nom_DR", Session::get('dr_id'));
+    }
+    if (Session::has('str_id')) {
+        $affairesWithSite = $affairesWithSite->where("Taffaire.code_agence", Session::get('str_id'));
+    }
+
+$(document).ready(function() {
+    $("id").on('change', function() {
+        var type = $(this).val();
+        $.ajax({
+            url: "{{ route('filter')}},
+            type: "GET",
+            data: {'type': type},
+            success: function(data) {
+                var boncommands = data.boncommands;
+                var html = '';
+                if(boncommands.length > 0) {
+                    html += '<tr>\
+                            </tr>';
+                }
+                else 
+                {
+                    html = 'Not Found !';
+                }
+
+                $('#body').html(html);
+            }
+        })
+    })
+})
+
+public function filter(Request $request) {
+
+    $query = b_bcommande::query();
+
+    if($request->ajax()) {
+        $boncommands = $query->where(['type' => $request->type]);
+        return $response()->json(['boncommands' => $boncommands]);
+    }
+    $boncommands = $query->get();
+}
